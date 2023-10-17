@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 
-DOMAIN = "intellifire"
+DOMAIN = "intellifire_hacs"
 
 CONF_USER_ID = "user_id"
 
