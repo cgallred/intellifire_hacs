@@ -105,8 +105,3 @@ class IntelliFireSwitch(IntelliFireEntity, SwitchEntity):
     def is_on(self) -> bool | None:
         """Return the on state."""
         return self.entity_description.value_fn(self.coordinator)
-
-    # @property
-    # def icon(self) -> str:
-    #     """Return switch icon."""
-    #     return "mdi:wifi" if self.is_on else "mdi:wifi-off"

@@ -14,7 +14,13 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.components.dhcp import DhcpServiceInfo
-from homeassistant.const import CONF_API_KEY, CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import (
+    CONF_API_KEY,
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_UNIQUE_ID,
+    CONF_USERNAME,
+)
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
@@ -111,6 +117,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_PASSWORD: password,
             CONF_USERNAME: username,
             CONF_API_KEY: api_key,
+            CONF_UNIQUE_ID: serial,
             CONF_USER_ID: user_id,
         }
         options = {
@@ -201,7 +208,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_api_config()
 
-    async def async_step_manual_device_entry(self, user_input=None):
+    async def async_step_manual_device_entry(self, user_input=None) -> FlowResult:
         """Handle manual input of local IP configuration."""
         LOGGER.debug("STEP: manual_device_entry")
         errors = {}

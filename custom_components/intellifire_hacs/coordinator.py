@@ -1,10 +1,10 @@
 """The IntelliFire integration."""
 from __future__ import annotations
 
+from asyncio import timeout
 from datetime import timedelta
 
 from aiohttp import ClientConnectionError
-from async_timeout import timeout
 from intellifire4py.cloud_api import IntelliFireAPICloud
 from intellifire4py.const import IntelliFireApiMode
 from intellifire4py.control import IntelliFireController
