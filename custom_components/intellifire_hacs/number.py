@@ -33,7 +33,7 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            IntellifireFlameControlEntity(
+            IntelliFireFlameControlEntity(
                 coordinator=coordinator, description=description
             )
         ]
@@ -41,13 +41,14 @@ async def async_setup_entry(
 
 
 @dataclass
-class IntellifireFlameControlEntity(IntelliFireEntity, NumberEntity):
+class IntelliFireFlameControlEntity(IntelliFireEntity, NumberEntity):
     """Flame height control entity."""
 
     _attr_native_max_value: float = 5
     _attr_native_min_value: float = 1
     _attr_native_step: float = 1
     _attr_mode: NumberMode = NumberMode.SLIDER
+    _attr_has_entity_name = True
 
     def __init__(
         self,

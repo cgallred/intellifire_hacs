@@ -62,23 +62,13 @@ class IntelliFireDataUpdateCoordinator(DataUpdateCoordinator[IntelliFirePollData
     async def set_read_mode(self, mode: IntelliFireApiMode):
         """Set the read mode between Cloud/Local."""
         LOGGER.debug("Changing READ mode: %s=>%s", self._read_mode.name, mode.name)
-        self._read_mode = mode
-
-    def get_control_mode(self) -> IntelliFireApiMode:
-        """Read control mode as a property."""
-        return self._control_mode
-
-    async def set_control_mode(self, mode: IntelliFireApiMode):
-        """Set the control mode between Cloud/Local."""
-        LOGGER.debug(
-            "Changing CONTROL mode: %s=>%s", self._control_mode.name, mode.name
-        )
-        current_mode = self._control_mode
+        current_mode = self._read_mode
 
         if current_mode == mode:
             LOGGER.info("Not updating mode -- it was the same")
             return
 
+        # Process the mode change
         if current_mode == IntelliFireApiMode.LOCAL:  # Switching to cloud
             # Switch from local to cloud polling
             await self._local_api.stop_background_polling()
@@ -95,6 +85,21 @@ class IntelliFireDataUpdateCoordinator(DataUpdateCoordinator[IntelliFirePollData
             self._local_api.overwrite_data(self._cloud_api.data)
 
             await self._local_api.start_background_polling()
+
+        # Update the mode
+        self._read_mode = mode
+
+    def get_control_mode(self) -> IntelliFireApiMode:
+        """Read control mode as a property."""
+
+        return self._control_mode
+
+    async def set_control_mode(self, mode: IntelliFireApiMode):
+        """Set the control mode between Cloud/Local."""
+        LOGGER.debug(
+            "Changing CONTROL mode: %s=>%s", self._control_mode.name, mode.name
+        )
+        self._control_mode = mode
 
     async def _async_update_data(self) -> IntelliFirePollData:
         LOGGER.debug("Update Data Called [%s]", self._read_mode.name)
