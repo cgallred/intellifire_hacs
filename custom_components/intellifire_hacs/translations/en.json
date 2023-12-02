@@ -1,47 +1,29 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Device is already configured",
+            "all_devices_already_configured": "All available devices have already been configured.",
             "not_intellifire_device": "Not an IntelliFire Device.",
             "reauth_successful": "Re-authentication was successful"
         },
         "error": {
-            "api_error": "Login failed",
-            "cannot_connect": "Failed to connect",
-            "iftapi_connect": "Error conecting to iftapi.net"
+            "api_error": "Login failed"
         },
         "flow_title": "{serial} ({host})",
         "step": {
-            "api_config": {
+            "cloud_api": {
                 "data": {
-                    "cloud_control": "Control device via Cloud API",
-                    "cloud_read": "Read data from Cloud API",
                     "password": "Password",
                     "username": "Email"
                 },
                 "data_description": {
-                    "cloud_control": "I AM IN CONTROL",
-                    "cloud_read": "You like read",
-                    "password": "DIS ME",
-                    "username": "WHO DIS"
+                    "password": "IntelliFire Password",
+                    "username": "IntelliFire Username"
                 },
-                "description": "Form instructions go here"
+                "description": "Authenticate against IntelliFire Cloud"
             },
-            "dhcp_confirm": {
-                "description": "Do you want to set up {host}\nSerial: {serial}?"
-            },
-            "manual_device_entry": {
-                "data": {
-                    "host": "Host (IP Address)"
-                },
-                "description": "Local Configuration"
-            },
-            "pick_device": {
-                "data": {
-                    "host": "Host"
-                },
-                "description": "The following IntelliFire devices were discovered. Please select which you wish to configure.",
-                "title": "Device Selection"
+            "pick_cloud_device": {
+                "description": "Select Fireplace by Serial Number:",
+                "title": "Configure fireplace"
             }
         }
     },
@@ -150,12 +132,12 @@
         "step": {
             "options": {
                 "data": {
-                    "cloud_control": "Control device via Cloud API",
-                    "cloud_read": "Read data from Cloud API"
+                    "cloud_control": "How do you want to control the Fireplace",
+                    "cloud_read": "How should we read Fireplace Data"
                 },
                 "data_description": {
-                    "cloud_control": "Some users have reported better experience using the Cloud API as the local IoT hardware semes to prioritize cloud over local",
-                    "cloud_read": "Some users have reported better experience using the Cloud API as the local IoT hardware semes to prioritize cloud over local"
+                    "cloud_control": "Some users have reported better experience using the Cloud API as the local IoT hardware seems to prioritize cloud over local",
+                    "cloud_read": "Some users have reported better experience using the Cloud API as the local IoT hardware seems to prioritize cloud over local"
                 },
                 "description": "Please select if you wish to use Cloud or Local APIs",
                 "title": "Local/Cloud API Selection."
