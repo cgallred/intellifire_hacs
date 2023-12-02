@@ -5,14 +5,21 @@ import logging
 
 DOMAIN = "intellifire_hacs"
 
-CONF_USER_ID = "user_id"
+CONF_USER_ID = "user_id"  # part of the cloud cookie
+CONF_WEB_CLIENT_ID = "web_client_id"  # part of the cloud cookie
+CONF_AUTH_COOKIE = "auth_cookie"  # part of the cloud cookie
 
 LOGGER = logging.getLogger(__package__)
 
-CONF_SERIAL = "serial"
 
 DEFAULT_THERMOSTAT_TEMP = 21
 
+# CONF_HOST provides IP ADDRESS
+# CONF_APK_KEY provides api_key
+CONF_SERIAL = "serial"
 
-CONF_CLOUD_READ_MODE = "cloud_read"
-CONF_CLOUD_CONTROL_MODE = "cloud_control"
+CONF_READ_MODE = "cloud_read"
+CONF_CONTROL_MODE = "cloud_control"
+
+API_MODE_LOCAL = "local"
+API_MODE_CLOUD = "cloud"
