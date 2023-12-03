@@ -3,10 +3,8 @@ from __future__ import annotations
 
 import asyncio
 
-import httpx
 from intellifire4py import UnifiedFireplace
 from intellifire4py.cloud_interface import IntelliFireCloudInterface
-from intellifire4py.exceptions import ApiCallError
 from intellifire4py.model import IntelliFireCommonFireplaceData
 
 from homeassistant.config_entries import ConfigEntry
@@ -18,7 +16,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed
 
 from .const import (
     CONF_AUTH_COOKIE,
@@ -119,13 +117,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         common_data
     )
 
-    try:
-        # Validate credentials by doing a cloud_poll
-        await fireplace.perform_cloud_poll()
-    except ApiCallError as err:
-        raise ConfigEntryAuthFailed(err) from err
-    except httpx.ConnectError as err:
-        raise ConfigEntryNotReady from err
+    local_connect, cloud_connect = await _async_validate_connectivity(
+        fireplace=fireplace, timeout=30
+    )
+    LOGGER.info(
+        f"IntelliFire Connectivity: Local[{local_connect}]  Cloud[{cloud_connect}]"
+    )
+
+    # If neither Local nor Cloud works - raise an Authentication issue
+    if (local_connect, cloud_connect) == (False, False):
+        raise ConfigEntryAuthFailed
 
     try:
         # Wait for data - could have some logic to switch between cloud and local perhaps after a set timeout?
@@ -148,6 +149,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(update_listener))
     return True
+
+
+async def _async_validate_connectivity(
+    fireplace: UnifiedFireplace, timeout=600
+) -> tuple[bool, bool]:
+    """Check local and cloud connectivity."""
+
+    async def with_timeout(coroutine):
+        try:
+            await asyncio.wait_for(coroutine, timeout)
+            return True
+        except asyncio.TimeoutError:
+            return False
+        except Exception:  # pylint: disable=broad-except
+            return False
+
+    local_future = with_timeout(fireplace.perform_local_poll())
+    cloud_future = with_timeout(fireplace.perform_cloud_poll())
+
+    local_success, cloud_success = await asyncio.gather(local_future, cloud_future)
+    return local_success, cloud_success
 
 
 async def _async_wait_for_initialization(fireplace, timeout=600):
