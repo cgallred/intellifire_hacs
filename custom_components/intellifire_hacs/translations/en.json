@@ -8,7 +8,7 @@
         "error": {
             "api_error": "Login failed"
         },
-        "flow_title": "{serial} ({host})",
+        "flow_title": "{serial}",
         "step": {
             "cloud_api": {
                 "data": {
@@ -86,13 +86,16 @@
             }
         },
         "number": {
-            "flame_control": {
-                "name": "Flame control"
+            "flame_height": {
+                "name": "Flame height"
             }
         },
         "sensor": {
             "connection_quality": {
                 "name": "Connection quality"
+            },
+            "control_mode": {
+                "name": "Control mode"
             },
             "downtime": {
                 "name": "Downtime"
@@ -103,11 +106,11 @@
             "fan_speed": {
                 "name": "Fan Speed"
             },
-            "flame_height": {
-                "name": "Flame height"
-            },
             "ipv4_address": {
                 "name": "IP address"
+            },
+            "read_mode": {
+                "name": "Read mode"
             },
             "target_temp": {
                 "name": "Target temperature"

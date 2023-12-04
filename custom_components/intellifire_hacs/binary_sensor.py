@@ -139,6 +139,14 @@ INTELLIFIRE_BINARY_SENSORS: tuple[IntellifireBinarySensorEntityDescription, ...]
         value_fn=lambda data: data.error_offline,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
+    # IntellifireBinarySensorEntityDescription(
+    #     key="read_mode",
+    #     translation_key="read_mode",
+    #     entity_category=EntityCategory.DIAGNOSTIC
+    # )
+    # mdi:lan-connect
+    # mdi:cloud-arrow-up
+    # mdi:cloud-arrow-down (read)
 )
 
 

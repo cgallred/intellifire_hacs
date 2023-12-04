@@ -225,12 +225,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Perform reauth upon an API authentication error."""
         LOGGER.debug("STEP: reauth")
         entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
-        assert entry
-        assert entry.unique_id
 
         # populate the expected vars
-        self._dhcp_discovered_serial = entry.unique_id
-        self._dhcp_discovered_serial = entry.data[CONF_SERIAL]
+        self._dhcp_discovered_serial = entry.data[CONF_SERIAL]  # type: ignore[union-attr]
+
+        placeholders = {"serial": self._dhcp_discovered_serial}
+        self.context["title_placeholders"] = placeholders
 
         return await self.async_step_cloud_api()
 

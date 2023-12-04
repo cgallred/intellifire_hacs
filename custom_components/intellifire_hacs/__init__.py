@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 
+from httpx import ConnectError
 from intellifire4py import UnifiedFireplace
 from intellifire4py.cloud_interface import IntelliFireCloudInterface
 from intellifire4py.model import IntelliFireCommonFireplaceData
@@ -126,7 +127,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # If neither Local nor Cloud works - raise an Authentication issue
     if (local_connect, cloud_connect) == (False, False):
-        raise ConfigEntryAuthFailed
+        raise ConfigEntryAuthFailed(
+            "IntelliFire was unable to connect to either Cloud or Local interfaces."
+        )
 
     try:
         # Wait for data - could have some logic to switch between cloud and local perhaps after a set timeout?
@@ -162,7 +165,7 @@ async def _async_validate_connectivity(
             return True
         except asyncio.TimeoutError:
             return False
-        except Exception:  # pylint: disable=broad-except
+        except ConnectError:
             return False
 
     local_future = with_timeout(fireplace.perform_local_poll())

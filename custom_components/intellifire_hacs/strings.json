@@ -16,7 +16,7 @@
     }
   },
   "config": {
-    "flow_title": "{serial} ({host})",
+    "flow_title": "{serial}",
     "step": {
       "pick_cloud_device": {
         "title": "Configure fireplace",
