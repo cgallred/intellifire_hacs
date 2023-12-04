@@ -5,8 +5,6 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any
 
-from intellifire4py.const import IntelliFireApiMode
-
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -37,37 +35,18 @@ INTELLIFIRE_SWITCHES: tuple[IntelliFireSwitchEntityDescription, ...] = (
     IntelliFireSwitchEntityDescription(
         key="on_off",
         translation_key="flame",
-        on_fn=lambda coordinator: coordinator.get_control_api().flame_on(),
-        off_fn=lambda coordinator: coordinator.get_control_api().flame_off(),
-        value_fn=lambda coordinator: coordinator.get_read_api().data.is_on,
+        icon="mdi:fire",
+        on_fn=lambda coordinator: coordinator.control_api.flame_on(),
+        off_fn=lambda coordinator: coordinator.control_api.flame_off(),
+        value_fn=lambda coordinator: coordinator.read_api.data.is_on,
     ),
     IntelliFireSwitchEntityDescription(
         key="pilot",
         translation_key="pilot_light",
         icon="mdi:fire-alert",
-        on_fn=lambda coordinator: coordinator.get_control_api().pilot_on(),
-        off_fn=lambda coordinator: coordinator.get_control_api().pilot_off(),
-        value_fn=lambda coordinator: coordinator.get_read_api().data.pilot_on,
-    ),
-    IntelliFireSwitchEntityDescription(
-        key="cloud_read",
-        name="Cloud read",
-        on_fn=lambda coordinator: coordinator.set_read_mode(IntelliFireApiMode.CLOUD),
-        off_fn=lambda coordinator: coordinator.set_read_mode(IntelliFireApiMode.LOCAL),
-        value_fn=lambda coordinator: coordinator.get_read_mode()
-        == IntelliFireApiMode.CLOUD,
-    ),
-    IntelliFireSwitchEntityDescription(
-        key="cloud_control",
-        name="Cloud control",
-        on_fn=lambda coordinator: coordinator.set_control_mode(
-            IntelliFireApiMode.CLOUD
-        ),
-        off_fn=lambda coordinator: coordinator.set_control_mode(
-            IntelliFireApiMode.LOCAL
-        ),
-        value_fn=lambda coordinator: coordinator.get_control_mode()
-        == IntelliFireApiMode.CLOUD,
+        on_fn=lambda coordinator: coordinator.control_api.pilot_on(),
+        off_fn=lambda coordinator: coordinator.control_api.pilot_off(),
+        value_fn=lambda coordinator: coordinator.read_api.data.pilot_on,
     ),
 )
 

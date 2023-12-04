@@ -33,7 +33,7 @@ async def async_setup_entry(
 
     if coordinator.data.has_thermostat:
         async_add_entities(
-            IntellifireClimate(
+            IntelliFireClimate(
                 coordinator=coordinator,
                 description=description,
             )
@@ -41,8 +41,8 @@ async def async_setup_entry(
         )
 
 
-class IntellifireClimate(IntelliFireEntity, ClimateEntity):
-    """Intellifire climate entity."""
+class IntelliFireClimate(IntelliFireEntity, ClimateEntity):
+    """IntelliFire climate entity."""
 
     entity_description: ClimateEntityDescription
 
@@ -68,7 +68,7 @@ class IntellifireClimate(IntelliFireEntity, ClimateEntity):
     @property
     def hvac_mode(self) -> HVACMode:
         """Return current hvac mode."""
-        if self.coordinator.get_read_api().data.thermostat_on:
+        if self.coordinator.read_api.data.thermostat_on:
             return HVACMode.HEAT
         return HVACMode.OFF
 
@@ -81,19 +81,19 @@ class IntellifireClimate(IntelliFireEntity, ClimateEntity):
             int(raw_target_temp),
             (raw_target_temp * 9 / 5) + 32,
         )
-        await self.coordinator.get_control_api().set_thermostat_c(
+        await self.coordinator.control_api.set_thermostat_c(
             temp_c=self.last_temp,
         )
 
     @property
     def current_temperature(self) -> float:
         """Return the current temperature."""
-        return float(self.coordinator.get_read_api().data.temperature_c)
+        return float(self.coordinator.read_api.data.temperature_c)
 
     @property
     def target_temperature(self) -> float:
         """Return target temperature."""
-        return float(self.coordinator.get_read_api().data.thermostat_setpoint_c)
+        return float(self.coordinator.read_api.data.thermostat_setpoint_c)
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set HVAC mode to normal or thermostat control."""
@@ -102,15 +102,15 @@ class IntellifireClimate(IntelliFireEntity, ClimateEntity):
         )
 
         if hvac_mode == HVACMode.OFF:
-            await self.coordinator.get_control_api().turn_off_thermostat()
+            await self.coordinator.control_api.turn_off_thermostat()
             return
 
         # hvac_mode == HVACMode.HEAT
         # 1) Set the desired target temp
-        await self.coordinator.get_control_api().set_thermostat_c(
+        await self.coordinator.control_api.set_thermostat_c(
             temp_c=self.last_temp,
         )
 
         # 2) Make sure the fireplace is on!
-        if not self.coordinator.get_read_api().data.is_on:
-            await self.coordinator.get_control_api().flame_on()
+        if not self.coordinator.read_api.data.is_on:
+            await self.coordinator.control_api.flame_on()

@@ -4,8 +4,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from intellifire4py.model import IntelliFirePollData
-
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -25,7 +23,7 @@ from .entity import IntelliFireEntity
 class IntellifireBinarySensorRequiredKeysMixin:
     """Mixin for required keys."""
 
-    value_fn: Callable[[IntelliFirePollData], bool]
+    value_fn: Callable[[IntelliFireDataUpdateCoordinator], bool]
 
 
 @dataclass
@@ -40,38 +38,38 @@ INTELLIFIRE_BINARY_SENSORS: tuple[IntellifireBinarySensorEntityDescription, ...]
         key="on_off",  # This is the sensor name
         translation_key="flame",  # This is the translation key
         icon="mdi:fire",
-        value_fn=lambda data: data.is_on,
+        value_fn=lambda coordinator: coordinator.read_api.data.is_on,
     ),
     IntellifireBinarySensorEntityDescription(
         key="timer_on",
         translation_key="timer_on",
         icon="mdi:camera-timer",
-        value_fn=lambda data: data.timer_on,
+        value_fn=lambda coordinator: coordinator.read_api.data.timer_on,
     ),
     IntellifireBinarySensorEntityDescription(
         key="pilot_light_on",
         translation_key="pilot_light_on",
         icon="mdi:fire-alert",
-        value_fn=lambda data: data.pilot_on,
+        value_fn=lambda coordinator: coordinator.read_api.data.pilot_on,
     ),
     IntellifireBinarySensorEntityDescription(
         key="thermostat_on",
         translation_key="thermostat_on",
         icon="mdi:home-thermometer-outline",
-        value_fn=lambda data: data.thermostat_on,
+        value_fn=lambda coordinator: coordinator.read_api.data.thermostat_on,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_pilot_flame",
         translation_key="pilot_flame_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_pilot_flame,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_pilot_flame,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_flame",
         translation_key="flame_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_flame,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_flame,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
@@ -79,21 +77,21 @@ INTELLIFIRE_BINARY_SENSORS: tuple[IntellifireBinarySensorEntityDescription, ...]
         translation_key="fan_delay_error",
         icon="mdi:fan-alert",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_fan_delay,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_fan_delay,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_maintenance",
         translation_key="maintenance_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_maintenance,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_maintenance,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_disabled",
         translation_key="disabled_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_disabled,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_disabled,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
@@ -101,53 +99,75 @@ INTELLIFIRE_BINARY_SENSORS: tuple[IntellifireBinarySensorEntityDescription, ...]
         translation_key="fan_error",
         icon="mdi:fan-alert",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_fan,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_fan,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_lights",
         translation_key="lights_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_lights,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_lights,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_accessory",
         translation_key="accessory_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_accessory,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_accessory,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_soft_lock_out",
         translation_key="soft_lock_out_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_soft_lock_out,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_soft_lock_out,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_ecm_offline",
         translation_key="ecm_offline_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_ecm_offline,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_ecm_offline,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     IntellifireBinarySensorEntityDescription(
         key="error_offline",
         translation_key="offline_error",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda data: data.error_offline,
+        value_fn=lambda coordinator: coordinator.read_api.data.error_offline,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     # IntellifireBinarySensorEntityDescription(
     #     key="read_mode",
     #     translation_key="read_mode",
-    #     entity_category=EntityCategory.DIAGNOSTIC
+    #     entity_category=EntityCategory.DIAGNOSTIC,
+    #     value_fn=lambda data: read_mode
     # )
     # mdi:lan-connect
     # mdi:cloud-arrow-up
     # mdi:cloud-arrow-down (read)
 )
+#
+# IntelliFireSwitchEntityDescription(
+#     key="cloud_read",
+#     name="Cloud read",
+#     on_fn=lambda coordinator: coordinator.set_read_mode(IntelliFireApiMode.CLOUD),
+#     off_fn=lambda coordinator: coordinator.set_read_mode(IntelliFireApiMode.LOCAL),
+#     value_fn=lambda coordinator: coordinator.get_read_mode()
+#                                  == IntelliFireApiMode.CLOUD,
+# ),
+# IntelliFireSwitchEntityDescription(
+#     key="cloud_control",
+#     name="Cloud control",
+#     on_fn=lambda coordinator: coordinator.set_control_mode(
+#         IntelliFireApiMode.CLOUD
+#     ),
+#     off_fn=lambda coordinator: coordinator.set_control_mode(
+#         IntelliFireApiMode.LOCAL
+#     ),
+#     value_fn=lambda coordinator: coordinator.get_control_mode()
+#                                  == IntelliFireApiMode.CLOUD,
+# ),
 
 
 async def async_setup_entry(
@@ -172,4 +192,4 @@ class IntellifireBinarySensor(IntelliFireEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Use this to get the correct value."""
-        return self.entity_description.value_fn(self.coordinator.get_read_api().data)
+        return self.entity_description.value_fn(self.coordinator)

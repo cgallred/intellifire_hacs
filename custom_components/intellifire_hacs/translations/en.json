@@ -86,8 +86,8 @@
             }
         },
         "number": {
-            "flame_height": {
-                "name": "Flame height"
+            "flame_control": {
+                "name": "Flame ceight"
             }
         },
         "sensor": {
@@ -105,6 +105,9 @@
             },
             "fan_speed": {
                 "name": "Fan Speed"
+            },
+            "flame_height": {
+                "name": "Flame height"
             },
             "ipv4_address": {
                 "name": "IP address"

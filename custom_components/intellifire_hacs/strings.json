@@ -103,13 +103,17 @@
     },
     "number": {
       "flame_control": {
-        "name": "Flame control"
+        "name": "Flame ceight"
       }
     },
     "sensor": {
-      "flame_height": {
-        "name": "Flame height"
+      "control_mode": {
+        "name": "Control mode"
       },
+      "read_mode": {
+        "name": "Read mode"
+      },
+      "flame_height": { "name": "Flame height" },
       "target_temp": {
         "name": "Target temperature"
       },

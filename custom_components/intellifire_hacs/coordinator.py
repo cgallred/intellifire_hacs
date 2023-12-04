@@ -34,11 +34,13 @@ class IntelliFireDataUpdateCoordinator(DataUpdateCoordinator[IntelliFirePollData
 
         self.fireplace = fireplace
 
-    def get_read_api(self) -> IntelliFireDataProvider:
+    @property
+    def read_api(self) -> IntelliFireDataProvider:
         """Return the Status API pointer."""
         return self.fireplace.read_api
 
-    def get_control_api(self) -> IntelliFireController:
+    @property
+    def control_api(self) -> IntelliFireController:
         """Return the control API."""
         return self.fireplace.control_api
 
@@ -65,7 +67,7 @@ class IntelliFireDataUpdateCoordinator(DataUpdateCoordinator[IntelliFirePollData
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
 
-        data = self.get_read_api().data
+        data = self.read_api.data
         return DeviceInfo(
             manufacturer="Hearth and Home",
             model="IFT-WFM",

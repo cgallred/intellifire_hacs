@@ -58,16 +58,12 @@ class IntellifireLight(IntelliFireEntity, LightEntity):
     @property
     def brightness(self) -> int:
         """Return the current brightness 0-255."""
-        return 85 * self.entity_description.value_fn(
-            self.coordinator.get_read_api().data
-        )
+        return 85 * self.entity_description.value_fn(self.coordinator.read_api.data)
 
     @property
     def is_on(self) -> bool | None:
         """Return true if light is on."""
-        return (
-            self.entity_description.value_fn(self.coordinator.get_read_api().data) >= 1
-        )
+        return self.entity_description.value_fn(self.coordinator.read_api.data) >= 1
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Instruct the light to turn on."""
@@ -76,14 +72,12 @@ class IntellifireLight(IntelliFireEntity, LightEntity):
         else:
             light_level = 2
 
-        await self.entity_description.set_fn(
-            self.coordinator.get_control_api(), light_level
-        )
+        await self.entity_description.set_fn(self.coordinator.control_api, light_level)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Instruct the light to turn off."""
-        await self.entity_description.set_fn(self.coordinator.get_control_api(), 0)
+        await self.entity_description.set_fn(self.coordinator.control_api, 0)
         await self.coordinator.async_request_refresh()
 
 

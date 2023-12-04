@@ -62,7 +62,7 @@ class IntelliFireFlameControlEntity(IntelliFireEntity, NumberEntity):
     def native_value(self) -> float | None:
         """Return the current Flame Height segment number value."""
         # UI uses 1-5 for flame height, backing lib uses 0-4
-        value = self.coordinator.get_read_api().data.flameheight + 1
+        value = self.coordinator.read_api.data.flameheight + 1
         return value
 
     async def async_set_native_value(self, value: float) -> None:
@@ -74,5 +74,5 @@ class IntelliFireFlameControlEntity(IntelliFireEntity, NumberEntity):
             value,
             value_to_send,
         )
-        await self.coordinator.get_control_api().set_flame_height(height=value_to_send)
+        await self.coordinator.control_api.set_flame_height(height=value_to_send)
         await self.coordinator.async_refresh()

@@ -80,16 +80,14 @@ class IntellifireFan(IntelliFireEntity, FanEntity):
     @property
     def is_on(self) -> bool:
         """Return on or off."""
-        return (
-            self.entity_description.value_fn(self.coordinator.get_read_api().data) >= 1
-        )
+        return self.entity_description.value_fn(self.coordinator.read_api.data) >= 1
 
     @property
     def percentage(self) -> int | None:
         """Return fan percentage."""
         return ranged_value_to_percentage(
             self.entity_description.speed_range,
-            self.coordinator.get_read_api().data.fanspeed,
+            self.coordinator.read_api.data.fanspeed,
         )
 
     @property
@@ -105,9 +103,7 @@ class IntellifireFan(IntelliFireEntity, FanEntity):
         int_value = math.ceil(
             percentage_to_ranged_value(self.entity_description.speed_range, percentage)
         )
-        await self.entity_description.set_fn(
-            self.coordinator.get_control_api(), int_value
-        )
+        await self.entity_description.set_fn(self.coordinator.control_api, int_value)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_on(
@@ -125,12 +121,10 @@ class IntellifireFan(IntelliFireEntity, FanEntity):
             )
         else:
             int_value = 1
-        await self.entity_description.set_fn(
-            self.coordinator.get_control_api(), int_value
-        )
+        await self.entity_description.set_fn(self.coordinator.control_api, int_value)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the fan."""
-        await self.entity_description.set_fn(self.coordinator.get_control_api(), 0)
+        await self.entity_description.set_fn(self.coordinator.control_api, 0)
         await self.coordinator.async_request_refresh()
