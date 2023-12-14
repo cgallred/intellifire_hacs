@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import asyncio
+import re
 
-from httpx import ConnectError
 from intellifire4py import UnifiedFireplace
 from intellifire4py.cloud_interface import IntelliFireCloudInterface
 from intellifire4py.model import IntelliFireCommonFireplaceData
@@ -17,7 +17,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 
 from .const import (
     CONF_AUTH_COOKIE,
@@ -29,7 +29,7 @@ from .const import (
     DOMAIN,
     LOGGER,
 )
-from .coordinator import IntelliFireDataUpdateCoordinator
+from .coordinator import IntellifireDataUpdateCoordinator
 
 PLATFORMS = [
     Platform.BINARY_SENSOR,
@@ -57,70 +57,80 @@ def _construct_common_data(entry: ConfigEntry) -> IntelliFireCommonFireplaceData
     )
 
 
-async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
-    """Migrate old entry."""
-    LOGGER.debug("Migrating from version %s", config_entry.version)
+async def _async_pseudo_migrate_entry(
+    hass: HomeAssistant, config_entry: ConfigEntry
+) -> ConfigEntry:
+    """Update configuration entry to latest VERSION 1 format.."""
+    new = {**config_entry.data}
+    # Rename Host to IP Address
+    new[CONF_IP_ADDRESS] = new.pop("host")
 
-    if config_entry.version == 1:
-        new = {**config_entry.data}
+    username = config_entry.data[CONF_USERNAME]
+    password = config_entry.data[CONF_PASSWORD]
 
-        # Rename Host to IP Address
-        new[CONF_IP_ADDRESS] = new.pop("host")
+    # Create a Cloud Interface
+    cloud_interface = IntelliFireCloudInterface()
+    await cloud_interface.login_with_credentials(username=username, password=password)
 
-        # Use credentials to get data I guess...
-        serial = config_entry.title.replace("Fireplace ", "")
+    # See if we can find the fireplace first by serial and then secondly by IP.
 
-        username = config_entry.data[CONF_USERNAME]
-        password = config_entry.data[CONF_PASSWORD]
+    serial = config_entry.title.replace("Fireplace ", "")
 
-        # Create a Cloud Interface
-        cloud_interface = IntelliFireCloudInterface()
-        await cloud_interface.login_with_credentials(
-            username=username, password=password
+    # If serial matches the hex style pattern we'll assume its good
+    valid_serial = bool(re.match(r"^[0-9A-Fa-f]{32}$", serial))
+
+    new_data = (
+        cloud_interface.user_data.get_data_for_serial(serial) if valid_serial else None
+    )
+    if not new_data:
+        new_data = cloud_interface.user_data.get_data_for_ip(new[CONF_IP_ADDRESS])
+
+    if not new_data:
+        raise ConfigEntryAuthFailed
+
+    # Find the correct fireplace
+    if new_data is not None:
+        new[CONF_API_KEY] = new_data.api_key
+        new[CONF_WEB_CLIENT_ID] = new_data.web_client_id
+        new[CONF_AUTH_COOKIE] = new_data.auth_cookie
+
+        new[CONF_IP_ADDRESS] = new_data.ip_address
+        new[CONF_SERIAL] = new_data.serial
+
+        config_entry.version = 1
+        hass.config_entries.async_update_entry(
+            config_entry,
+            data=new,
+            options={CONF_READ_MODE: "local", CONF_CONTROL_MODE: "local"},
+            unique_id=serial,
         )
+        LOGGER.debug("Pseudo Migration %s successful", config_entry.version)
 
-        new_data = cloud_interface.user_data.get_data_for_serial(serial)
-        # Find the correct fireplace
-        if new_data is not None:
-            new[CONF_API_KEY] = new_data.api_key
-            new[CONF_WEB_CLIENT_ID] = new_data.web_client_id
-            new[CONF_AUTH_COOKIE] = new_data.auth_cookie
-
-            new[CONF_IP_ADDRESS] = new_data.ip_address
-            new[CONF_SERIAL] = new_data.serial
-
-            config_entry.version = 2
-            hass.config_entries.async_update_entry(
-                config_entry,
-                data=new,
-                options={CONF_READ_MODE: "local", CONF_CONTROL_MODE: "local"},
-                unique_id=serial,
-            )
-            LOGGER.debug("Migration to version %s successful", config_entry.version)
-        else:
-            return False
-
-    return True
+    return config_entry
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up IntelliFire from a config entry."""
     LOGGER.debug("Setting up config entry: %s", entry.unique_id)
-    LOGGER.debug(entry)
 
     if CONF_USERNAME not in entry.data:
         LOGGER.debug("Super Old config entry format detected: %s", entry.unique_id)
         raise ConfigEntryAuthFailed
 
+    if CONF_IP_ADDRESS not in entry.data:
+        LOGGER.debug("Old config entry format detected: %s", entry.unique_id)
+        entry = await _async_pseudo_migrate_entry(hass, entry)
+
     # Build a common data object to pass to the coordinator
-    common_data: IntelliFireCommonFireplaceData = _construct_common_data(entry)
     fireplace: UnifiedFireplace = await UnifiedFireplace.build_fireplace_from_common(
-        common_data
+        _construct_common_data(entry)
     )
 
-    local_connect, cloud_connect = await _async_validate_connectivity(
-        fireplace=fireplace, timeout=30
+    # Validate connectivity
+    local_connect, cloud_connect = await fireplace.async_validate_connectivity(
+        timeout=30
     )
+
     LOGGER.info(
         f"IntelliFire Connectivity: Local[{local_connect}]  Cloud[{cloud_connect}]"
     )
@@ -132,17 +142,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
     try:
-        # Wait for data - could have some logic to switch between cloud and local perhaps after a set timeout?
-        await asyncio.wait_for(
-            _async_wait_for_initialization(fireplace), timeout=600
-        )  # 10 minutes
+        await asyncio.wait_for(_async_wait_for_initialization(fireplace), timeout=600)
     except asyncio.TimeoutError as err:
-        raise TimeoutError(
+        raise ConfigEntryNotReady(
             "Initialization of fireplace timed out after 10 minutes"
         ) from err
 
     # Construct coordinator
-    data_update_coordinator = IntelliFireDataUpdateCoordinator(
+    data_update_coordinator = IntellifireDataUpdateCoordinator(
         hass=hass, fireplace=fireplace
     )
 
@@ -152,27 +159,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(update_listener))
     return True
-
-
-async def _async_validate_connectivity(
-    fireplace: UnifiedFireplace, timeout=600
-) -> tuple[bool, bool]:
-    """Check local and cloud connectivity."""
-
-    async def with_timeout(coroutine):
-        try:
-            await asyncio.wait_for(coroutine, timeout)
-            return True
-        except asyncio.TimeoutError:
-            return False
-        except ConnectError:
-            return False
-
-    local_future = with_timeout(fireplace.perform_local_poll())
-    cloud_future = with_timeout(fireplace.perform_cloud_poll())
-
-    local_success, cloud_success = await asyncio.gather(local_future, cloud_future)
-    return local_success, cloud_success
 
 
 async def _async_wait_for_initialization(fireplace, timeout=600):

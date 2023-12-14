@@ -18,8 +18,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.dt import utcnow
 
 from .const import DOMAIN
-from .coordinator import IntelliFireDataUpdateCoordinator
-from .entity import IntelliFireEntity
+from .coordinator import IntellifireDataUpdateCoordinator
+from .entity import IntellifireEntity
 
 
 @dataclass
@@ -27,7 +27,7 @@ class IntellifireSensorRequiredKeysMixin:
     """Mixin for required keys."""
 
     value_fn: Callable[
-        [IntelliFireDataUpdateCoordinator], int | str | datetime | float | None
+        [IntellifireDataUpdateCoordinator], int | str | datetime | float | None
     ]
 
 
@@ -40,7 +40,7 @@ class IntellifireSensorEntityDescription(
 
 
 def _time_remaining_to_timestamp(
-    coordinator: IntelliFireDataUpdateCoordinator
+    coordinator: IntellifireDataUpdateCoordinator
 ) -> datetime | None:
     """Define a sensor that takes into account timezone."""
     if not (seconds_offset := coordinator.read_api.data.timeremaining_s):
@@ -49,7 +49,7 @@ def _time_remaining_to_timestamp(
 
 
 def _downtime_to_timestamp(
-    coordinator: IntelliFireDataUpdateCoordinator
+    coordinator: IntellifireDataUpdateCoordinator
 ) -> datetime | None:
     """Define a sensor that takes into account a timezone."""
     if not (seconds_offset := coordinator.read_api.data.downtime):
@@ -155,14 +155,14 @@ async def async_setup_entry(
 ) -> None:
     """Define setup entry call."""
 
-    coordinator: IntelliFireDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: IntellifireDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
-        IntelliFireSensor(coordinator=coordinator, description=description)
+        IntellifireSensor(coordinator=coordinator, description=description)
         for description in INTELLIFIRE_SENSORS
     )
 
 
-class IntelliFireSensor(IntelliFireEntity, SensorEntity):
+class IntellifireSensor(IntellifireEntity, SensorEntity):
     """Extends IntelliFireEntity with Sensor specific logic."""
 
     entity_description: IntellifireSensorEntityDescription

@@ -13,8 +13,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, LOGGER
-from .coordinator import IntelliFireDataUpdateCoordinator
-from .entity import IntelliFireEntity
+from .coordinator import IntellifireDataUpdateCoordinator
+from .entity import IntellifireEntity
 
 
 async def async_setup_entry(
@@ -23,7 +23,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the fans."""
-    coordinator: IntelliFireDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: IntellifireDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     description = NumberEntityDescription(
         key="flame_control",
@@ -33,7 +33,7 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            IntelliFireFlameControlEntity(
+            IntellifireFlameControlEntity(
                 coordinator=coordinator, description=description
             )
         ]
@@ -41,18 +41,17 @@ async def async_setup_entry(
 
 
 @dataclass
-class IntelliFireFlameControlEntity(IntelliFireEntity, NumberEntity):
+class IntellifireFlameControlEntity(IntellifireEntity, NumberEntity):
     """Flame height control entity."""
 
     _attr_native_max_value: float = 5
     _attr_native_min_value: float = 1
     _attr_native_step: float = 1
     _attr_mode: NumberMode = NumberMode.SLIDER
-    _attr_has_entity_name = True
 
     def __init__(
         self,
-        coordinator: IntelliFireDataUpdateCoordinator,
+        coordinator: IntellifireDataUpdateCoordinator,
         description: NumberEntityDescription,
     ) -> None:
         """Initialize Flame height Sensor."""

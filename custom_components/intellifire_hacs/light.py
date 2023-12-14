@@ -19,8 +19,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, LOGGER
-from .coordinator import IntelliFireDataUpdateCoordinator
-from .entity import IntelliFireEntity
+from .coordinator import IntellifireDataUpdateCoordinator
+from .entity import IntellifireEntity
 
 
 @dataclass
@@ -48,7 +48,7 @@ INTELLIFIRE_LIGHTS: tuple[IntellifireLightEntityDescription, ...] = (
 )
 
 
-class IntellifireLight(IntelliFireEntity, LightEntity):
+class IntellifireLight(IntellifireEntity, LightEntity):
     """Light entity for the fireplace."""
 
     entity_description: IntellifireLightEntityDescription
@@ -87,7 +87,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the fans."""
-    coordinator: IntelliFireDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: IntellifireDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     if coordinator.data.has_light:
         async_add_entities(

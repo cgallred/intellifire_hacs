@@ -71,7 +71,7 @@ async def _async_poll_local_fireplace_for_serial(
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for IntelliFire."""
 
-    VERSION = 2
+    VERSION = 1
 
     def __init__(self) -> None:
         """Initialize the Config Flow Handler."""
@@ -109,7 +109,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Authenticate against IFTAPI Cloud in order to see configured devices.
 
-        The only way to control a local fireplace appears to be via downloading a cloud API_KEY
+        Local control of IntelliFire devices requiers that the user download the correct API KEY which is only available on the cloud. Cloud control of the devices requires the user has at least once authenticated against the cloud and a set of cookie variables have been stored locally.
+
         """
         errors: dict[str, str] = {}
         LOGGER.debug("STEP: cloud_api")
@@ -144,14 +145,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Step to select a device from the cloud.
 
-        We can only get here if we have logged in.
+        We can only get here if we have logged in. If there is only one device available it will be auto-configured,
+        else the user will be given a choice to pick a device.
         """
         errors: dict[str, str] = {}
         LOGGER.debug(
             f"STEP: pick_cloud_device: {user_input} - DHCP_MODE[{self._dhcp_mode}"
         )
 
-        # If DHCP Mode we want to querty the existing fireplace I guess?
         if self._dhcp_mode or user_input is not None:
             if self._dhcp_mode:
                 serial = self._dhcp_discovered_serial
@@ -205,6 +206,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def _async_create_config_entry_from_common_data(
         self, fireplace: IntelliFireCommonFireplaceData
     ) -> FlowResult:
+        """Construct a config entry based on an object of IntelliFireCommonFireplaceData."""
         return self.async_create_entry(
             title=f"Fireplace {fireplace.serial}",
             data={

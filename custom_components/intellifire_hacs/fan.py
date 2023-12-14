@@ -23,8 +23,8 @@ from homeassistant.util.percentage import (
 )
 
 from .const import DOMAIN, LOGGER
-from .coordinator import IntelliFireDataUpdateCoordinator
-from .entity import IntelliFireEntity
+from .coordinator import IntellifireDataUpdateCoordinator
+from .entity import IntellifireEntity
 
 
 @dataclass
@@ -60,7 +60,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the fans."""
-    coordinator: IntelliFireDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: IntellifireDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     if coordinator.data.has_fan:
         async_add_entities(
@@ -71,7 +71,7 @@ async def async_setup_entry(
     LOGGER.debug("Disabling Fan - IntelliFire device does not appear to have one")
 
 
-class IntellifireFan(IntelliFireEntity, FanEntity):
+class IntellifireFan(IntellifireEntity, FanEntity):
     """Fan entity for the fireplace."""
 
     entity_description: IntellifireFanEntityDescription
