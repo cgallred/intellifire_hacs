@@ -15,7 +15,7 @@ from .const import DOMAIN
 from .entity import IntellifireEntity
 
 
-@dataclass()
+@dataclass(frozen=True)
 class IntellifireSwitchRequiredKeysMixin:
     """Mixin for required keys."""
 
@@ -24,7 +24,7 @@ class IntellifireSwitchRequiredKeysMixin:
     value_fn: Callable[[IntellifireDataUpdateCoordinator], bool]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IntellifireSwitchEntityDescription(
     SwitchEntityDescription, IntellifireSwitchRequiredKeysMixin
 ):

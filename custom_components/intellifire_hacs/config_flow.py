@@ -116,10 +116,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         LOGGER.debug("STEP: cloud_api")
         if user_input is not None:
             try:
-                await self.cloud_api_interface.login_with_credentials(
-                    username=user_input[CONF_USERNAME],
-                    password=user_input[CONF_PASSWORD],
-                )
+                async with self.cloud_api_interface as cloud_interface:
+                    await cloud_interface.login_with_credentials(
+                        username=user_input[CONF_USERNAME],
+                        password=user_input[CONF_PASSWORD],
+                    )
 
                 # Mark as logged in
                 self.logged_in = True

@@ -22,7 +22,7 @@ from .coordinator import IntellifireDataUpdateCoordinator
 from .entity import IntellifireEntity
 
 
-@dataclass
+@dataclass(frozen=True)
 class IntellifireSensorRequiredKeysMixin:
     """Mixin for required keys."""
 
@@ -31,7 +31,7 @@ class IntellifireSensorRequiredKeysMixin:
     ]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IntellifireSensorEntityDescription(
     SensorEntityDescription,
     IntellifireSensorRequiredKeysMixin,
@@ -40,7 +40,7 @@ class IntellifireSensorEntityDescription(
 
 
 def _time_remaining_to_timestamp(
-    coordinator: IntellifireDataUpdateCoordinator
+    coordinator: IntellifireDataUpdateCoordinator,
 ) -> datetime | None:
     """Define a sensor that takes into account timezone."""
     if not (seconds_offset := coordinator.read_api.data.timeremaining_s):
@@ -49,7 +49,7 @@ def _time_remaining_to_timestamp(
 
 
 def _downtime_to_timestamp(
-    coordinator: IntellifireDataUpdateCoordinator
+    coordinator: IntellifireDataUpdateCoordinator,
 ) -> datetime | None:
     """Define a sensor that takes into account a timezone."""
     if not (seconds_offset := coordinator.read_api.data.downtime):

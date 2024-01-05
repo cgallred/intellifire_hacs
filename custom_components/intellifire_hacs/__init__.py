@@ -69,21 +69,25 @@ async def _async_pseudo_migrate_entry(
     password = config_entry.data[CONF_PASSWORD]
 
     # Create a Cloud Interface
-    cloud_interface = IntelliFireCloudInterface()
-    await cloud_interface.login_with_credentials(username=username, password=password)
+    async with IntelliFireCloudInterface() as cloud_interface:
+        await cloud_interface.login_with_credentials(
+            username=username, password=password
+        )
 
-    # See if we can find the fireplace first by serial and then secondly by IP.
+        # See if we can find the fireplace first by serial and then secondly by IP.
 
-    serial = config_entry.title.replace("Fireplace ", "")
+        serial = config_entry.title.replace("Fireplace ", "")
 
-    # If serial matches the hex style pattern we'll assume its good
-    valid_serial = bool(re.match(r"^[0-9A-Fa-f]{32}$", serial))
+        # If serial matches the hex style pattern we'll assume its good
+        valid_serial = bool(re.match(r"^[0-9A-Fa-f]{32}$", serial))
 
-    new_data = (
-        cloud_interface.user_data.get_data_for_serial(serial) if valid_serial else None
-    )
-    if not new_data:
-        new_data = cloud_interface.user_data.get_data_for_ip(new[CONF_IP_ADDRESS])
+        new_data = (
+            cloud_interface.user_data.get_data_for_serial(serial)
+            if valid_serial
+            else None
+        )
+        if not new_data:
+            new_data = cloud_interface.user_data.get_data_for_ip(new[CONF_IP_ADDRESS])
 
     if not new_data:
         raise ConfigEntryAuthFailed

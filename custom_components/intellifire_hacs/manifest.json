@@ -1,15 +1,15 @@
 {
-  "domain": "intellifire_hacs",
-  "name": "IntelliFireHacs",
+  "domain": "intellifire",
+  "name": "IntelliFire",
   "codeowners": ["@jeeftor"],
   "config_flow": true,
   "dhcp": [
     {
       "hostname": "zentrios-*"
-    ,"version":"0.1"}
+    }
   ],
   "documentation": "https://www.home-assistant.io/integrations/intellifire",
   "iot_class": "local_polling",
   "loggers": ["intellifire4py"],
-  "requirements": ["intellifire4py==3.6.1"]
-,"version":"0.1"}
+  "requirements": ["intellifire4py==4.0.1"]
+}
