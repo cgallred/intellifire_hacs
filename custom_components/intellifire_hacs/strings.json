@@ -3,12 +3,12 @@
     "step": {
       "options": {
         "data": {
-          "cloud_read": "How should we read Fireplace Data",
-          "cloud_control": "How do you want to control the Fireplace"
+          "cloud_read": "What is your desired read mode",
+          "cloud_control": "Select your desired control mode"
         },
         "data_description": {
-          "cloud_read": "Some users have reported better experience using the Cloud API as the local IoT hardware seems to prioritize cloud over local",
-          "cloud_control": "Some users have reported better experience using the Cloud API as the local IoT hardware seems to prioritize cloud over local"
+          "cloud_read": "In the case that your selected mode is not reachable - the integration will automatically switch to the other mode.",
+          "cloud_control": "In the case that your selected mode is not reachable - the integration will automatically switch to the other mode."
         },
         "description": "Please select if you wish to use Cloud or Local APIs",
         "title": "Local/Cloud API Selection."

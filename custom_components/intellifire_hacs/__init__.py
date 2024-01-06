@@ -6,6 +6,7 @@ import re
 
 from intellifire4py import UnifiedFireplace
 from intellifire4py.cloud_interface import IntelliFireCloudInterface
+from intellifire4py.const import IntelliFireApiMode
 from intellifire4py.model import IntelliFireCommonFireplaceData
 
 from homeassistant.config_entries import ConfigEntry
@@ -125,27 +126,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         LOGGER.debug("Old config entry format detected: %s", entry.unique_id)
         entry = await _async_pseudo_migrate_entry(hass, entry)
 
-    # Build a common data object to pass to the coordinator
-    fireplace: UnifiedFireplace = await UnifiedFireplace.build_fireplace_from_common(
-        _construct_common_data(entry)
-    )
-
-    # Validate connectivity
-    local_connect, cloud_connect = await fireplace.async_validate_connectivity(
-        timeout=30
-    )
-
-    LOGGER.info(
-        f"IntelliFire Connectivity: Local[{local_connect}]  Cloud[{cloud_connect}]"
-    )
-
-    # If neither Local nor Cloud works - raise an Authentication issue
-    if (local_connect, cloud_connect) == (False, False):
-        raise ConfigEntryAuthFailed(
-            "IntelliFire was unable to connect to either Cloud or Local interfaces."
-        )
-
+    # Fireplace will throw an error if it can't connect
     try:
+        fireplace: UnifiedFireplace = (
+            await UnifiedFireplace.build_fireplace_from_common(
+                _construct_common_data(entry)
+            )
+        )
+        LOGGER.info("Waiting for Fireplace to Initialized")
         await asyncio.wait_for(_async_wait_for_initialization(fireplace), timeout=600)
     except asyncio.TimeoutError as err:
         raise ConfigEntryNotReady(
@@ -170,7 +158,7 @@ async def _async_wait_for_initialization(fireplace, timeout=600):
     while (
         fireplace.data.ipv4_address == "127.0.0.1" and fireplace.data.serial == "unset"
     ):
-        LOGGER.info("Waiting for fireplace to initialize")
+        LOGGER.info(f"Waiting for fireplace to initialize [{fireplace.read_mode}]")
         await asyncio.sleep(10)
 
 
@@ -184,5 +172,19 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle options update."""
+    LOGGER.info("Handling Options Update")
+    data_update_coordinator: IntellifireDataUpdateCoordinator = hass.data[DOMAIN][
+        entry.entry_id
+    ]
+    LOGGER.info(
+        f"Current Modes: Read [{data_update_coordinator.get_read_mode()}] Control [{data_update_coordinator.get_control_mode()}]"
+    )
+
+    await data_update_coordinator.set_read_mode(
+        IntelliFireApiMode(entry.options[CONF_READ_MODE])
+    )
+    await data_update_coordinator.set_control_mode(
+        IntelliFireApiMode(entry.options[CONF_CONTROL_MODE])
+    )
 
     await hass.config_entries.async_reload(entry.entry_id)
