@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 
-DOMAIN = "intellifire"
+DOMAIN = "intellifire_hacs"
 LOGGER = logging.getLogger(__package__)
 DEFAULT_THERMOSTAT_TEMP = 21
 
