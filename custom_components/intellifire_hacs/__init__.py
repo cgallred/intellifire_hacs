@@ -59,7 +59,7 @@ def _construct_common_data(entry: ConfigEntry) -> IntelliFireCommonFireplaceData
 
 
 async def _async_pseudo_migrate_entry(
-        hass: HomeAssistant, config_entry: ConfigEntry
+    hass: HomeAssistant, config_entry: ConfigEntry
 ) -> ConfigEntry:
     """Update configuration entry to latest VERSION 1 format.."""
     new = {**config_entry.data}
@@ -160,7 +160,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def _async_wait_for_initialization(fireplace, timeout=600):
     """Wait for a fireplace to be initialized."""
     while (
-            fireplace.data.ipv4_address == "127.0.0.1" and fireplace.data.serial == "unset"
+        fireplace.data.ipv4_address == "127.0.0.1" and fireplace.data.serial == "unset"
     ):
         LOGGER.info(f"Waiting for fireplace to initialize [{fireplace.read_mode}]")
         await asyncio.sleep(10)

@@ -299,8 +299,6 @@ class IntelliFireOptionsFlowHandler(config_entries.OptionsFlow):
                 title=self._config_entry.title, data=user_input
             )
 
-
-
         LOGGER.error("OptionsFlow::Showing Form:")
 
         existing_read = self._config_entry.options.get(CONF_READ_MODE, API_MODE_LOCAL)
