@@ -150,6 +150,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(update_listener))
+
     return True
 
 
@@ -170,13 +171,14 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return unload_ok
 
 
+
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle options update."""
-    LOGGER.info("Handling Options Update")
+    LOGGER.error("Handling Options Update")
     data_update_coordinator: IntellifireDataUpdateCoordinator = hass.data[DOMAIN][
         entry.entry_id
     ]
-    LOGGER.info(
+    LOGGER.error(
         f"Current Modes: Read [{data_update_coordinator.get_read_mode()}] Control [{data_update_coordinator.get_control_mode()}]"
     )
 
