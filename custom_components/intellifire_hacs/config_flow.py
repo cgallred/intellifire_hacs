@@ -290,17 +290,18 @@ class IntelliFireOptionsFlowHandler(config_entries.OptionsFlow):
 
         if user_input is not None:
             # Update config entry with data from user input
-            LOGGER.error("OptionsFlow::Updating existing entry")
-            self.hass.config_entries.async_update_entry(
-                self._config_entry, data=self._config_entry.data, options=user_input
-            )
+            # LOGGER.error("OptionsFlow::Updating existing entry")
+            # self.hass.config_entries.async_update_entry(
+            #     self._config_entry, data=self._config_entry.data, options=user_input
+            # )
             LOGGER.error("OptionsFlow::Calling Create Entry")
             return self.async_create_entry(
                 title=self._config_entry.title, data=user_input
             )
-        LOGGER.error("OptionsFlow::Showing Form:")
 
-        # Existing defaults
+
+
+        LOGGER.error("OptionsFlow::Showing Form:")
 
         existing_read = self._config_entry.options.get(CONF_READ_MODE, API_MODE_LOCAL)
         existing_control = self._config_entry.options.get(
