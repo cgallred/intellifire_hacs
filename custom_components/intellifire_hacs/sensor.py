@@ -147,6 +147,36 @@ INTELLIFIRE_SENSORS: tuple[IntellifireSensorEntityDescription, ...] = (
         options=["local", "cloud"],
         value_fn=lambda coordinator: coordinator.get_control_mode().name.lower(),
     ),
+
+    # HACS DIAGNOSTIC SENSORS
+    IntellifireSensorEntityDescription(
+        key="local_connectivity",
+        name="local_connectivity",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda coordinator: coordinator.fireplace.local_connectivity
+    ),
+
+    IntellifireSensorEntityDescription(
+        key="cloud_connectivity",
+        name="cloud_connectivity",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda coordinator: coordinator.fireplace.cloud_connectivity,
+    ),
+
+    IntellifireSensorEntityDescription(
+        key="local_polling",
+        name="local_polling",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda coordinator: coordinator.fireplace.is_local_polling
+    ),
+
+    IntellifireSensorEntityDescription(
+        key="cloud_polling",
+        name="cloud_polling",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda coordinator: coordinator.fireplace.is_cloud_polling,
+    ),
+
 )
 
 

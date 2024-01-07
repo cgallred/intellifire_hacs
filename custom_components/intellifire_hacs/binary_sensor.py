@@ -139,6 +139,23 @@ INTELLIFIRE_BINARY_SENSORS: tuple[IntellifireBinarySensorEntityDescription, ...]
         value_fn=lambda data: data.error_offline,
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
+    #
+    #
+    #
+    # IntellifireBinarySensorEntityDescription(
+    #     key="local_poll",
+    #     translation_key="local_poll",
+    #     entity_category=EntityCategory.DIAGNOSTIC,
+    #     value_fn=lambda data: data.error_offline,
+    #     device_class=BinarySensorDeviceClass.PROBLEM,
+    # ),
+    # IntellifireBinarySensorEntityDescription(
+    #     key="cloud_poll",
+    #     translation_key="cloud_poll",
+    #     entity_category=EntityCategory.DIAGNOSTIC,
+    #     value_fn=lambda data: data.error_offline,
+    #     device_class=BinarySensorDeviceClass.PROBLEM,
+    # ),
 )
 
 
