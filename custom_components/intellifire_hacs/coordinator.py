@@ -73,6 +73,5 @@ class IntellifireDataUpdateCoordinator(DataUpdateCoordinator[IntelliFirePollData
             model="IFT-WFM",
             name="IntelliFire",
             identifiers={("IntelliFire", f"{data.serial}]")},
-            sw_version=data.fw_ver_str,
             configuration_url=f"http://{self.fireplace.ip_address}/poll",
         )
