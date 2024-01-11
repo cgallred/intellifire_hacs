@@ -5,6 +5,7 @@ from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import IntellifireDataUpdateCoordinator
+from .const import LOGGER
 
 
 class IntellifireEntity(CoordinatorEntity[IntellifireDataUpdateCoordinator]):
@@ -20,6 +21,10 @@ class IntellifireEntity(CoordinatorEntity[IntellifireDataUpdateCoordinator]):
     ) -> None:
         """Class initializer."""
         super().__init__(coordinator=coordinator)
+
+        LOGGER.info("Setting up Entity %s", description.name)
+        LOGGER.info("Setting up Entity %s_%s", description.key, coordinator.fireplace.serial)
+
         self.entity_description = description
         self._attr_unique_id = f"{description.key}_{coordinator.fireplace.serial}"
 

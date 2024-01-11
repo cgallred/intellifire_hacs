@@ -140,7 +140,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             "Initialization of fireplace timed out after 10 minutes"
         ) from err
 
+    LOGGER.warn("Creating Data Update Coordinator")
     # Construct coordinator
+
+
+
     data_update_coordinator = IntellifireDataUpdateCoordinator(
         hass=hass, fireplace=fireplace
     )
@@ -152,6 +156,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = data_update_coordinator
 
+    LOGGER.warn("async_forward_entry_setups")
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
