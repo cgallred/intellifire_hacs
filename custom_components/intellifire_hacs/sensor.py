@@ -177,6 +177,15 @@ INTELLIFIRE_SENSORS: tuple[IntellifireSensorEntityDescription, ...] = (
         value_fn=lambda coordinator: coordinator.fireplace.is_cloud_polling,
     ),
 
+    # Diagnostic sensors of sorts
+    IntellifireSensorEntityDescription(
+        key="last_poll",
+        name="last_poll",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        value_fn=lambda coordinator: coordinator.read_api.last_poll
+    ),
+
 )
 
 
