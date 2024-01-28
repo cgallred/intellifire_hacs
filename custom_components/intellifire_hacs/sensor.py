@@ -183,7 +183,7 @@ INTELLIFIRE_SENSORS: tuple[IntellifireSensorEntityDescription, ...] = (
         name="last_poll",
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=SensorDeviceClass.TIMESTAMP,
-        value_fn=lambda coordinator: coordinator.read_api.last_poll
+        value_fn=lambda coordinator: coordinator.read_api.last_poll_utc
     ),
 
 )
